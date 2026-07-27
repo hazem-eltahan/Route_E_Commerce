@@ -41,7 +41,10 @@ namespace E_Commerce.Application.Common
             _value = default!;
         }
         public static Result<TValue> OK(TValue value) => new Result<TValue>(value);
-        public static Result<TValue> Fail(Error error) => new Result<TValue>(error);
-        public static Result<TValue> Fail(IReadOnlyList<Error> errors) => new Result<TValue>(errors);
+        public new static Result<TValue> Fail(Error error) => new Result<TValue>(error);
+        public new static Result<TValue> Fail(IReadOnlyList<Error> errors) => new Result<TValue>(errors);
+
+        public static implicit operator Result<TValue>(TValue value) => OK(value);
+        public static implicit operator Result<TValue>(Error error) => Fail(error);
     }
 }
