@@ -1,0 +1,71 @@
+﻿using E_Commerce.Domain.Common;
+using E_Commerce.Domain.Contracts;
+using E_Commerce.Domain.Entities.Products;
+using E_Commerce.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace E_Commerce.Infrastructure.DataSeeding
+{
+    internal class CatalogDataSeeder(StoreDbContext dbContext, ILogger<CatalogDataSeeder> logger) : IDataSeeder
+    {
+        public async Task SeedingDataAsync(CancellationToken ct = default)
+        {
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(ct);
+            if (pendingMigrations.Any())
+                await dbContext.Database.MigrateAsync(ct);
+
+            //Seeding
+            var seedingRoot = Path.Combine(AppContext.BaseDirectory, "DataSeeding");
+
+            await SeedIfEmptyAsync<ProductBrand, int>(seedingRoot, "brands.json", ct);
+            await SeedIfEmptyAsync<ProductType, int>(seedingRoot, "types.json", ct);
+            await SeedIfEmptyAsync<Product, int>(seedingRoot, "products.json", ct);
+
+            var result = await dbContext.SaveChangesAsync(ct);
+
+            if(result > 0)
+            {
+                logger.LogInformation($"{result} rows added!");
+            }
+            else
+            {
+                logger.LogInformation($"Data already seeded!");
+            }
+        }
+        private async Task SeedIfEmptyAsync<T,Tkey>(string rootPath, string fileName, CancellationToken ct) where T : BaseEntity<Tkey>
+        {
+            if (await dbContext.Set<T>().AnyAsync())
+            {
+                logger.LogInformation("Table already has data!");
+                return;
+            }
+            var filePath = Path.Combine(rootPath, fileName);
+
+            if(!File.Exists(filePath))
+            {
+                logger.LogWarning($"The file {fileName} does not exist!");
+                return;
+            }
+
+            using var fileStream = File.OpenRead(filePath);
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var items = await JsonSerializer.DeserializeAsync<List<T>>(fileStream, options, ct);
+
+            if(items?.Any() ?? false)
+                dbContext.Set<T>().AddRange(items);
+        }
+
+    }
+}
