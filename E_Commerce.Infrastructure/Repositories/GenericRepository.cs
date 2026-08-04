@@ -1,6 +1,7 @@
 ﻿using E_Commerce.Domain.Common;
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Infrastructure.Data;
+using E_Commerce.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,12 @@ namespace E_Commerce.Infrastructure.Repositories
         => await dbContext.Set<TEntity>().FindAsync(id, ct);
 
         public void Update(TEntity entity)=> dbContext.Update(entity);
+
+        public async Task<IReadOnlyList<TEntity>> GetAllAsync(ISpecification<TEntity, TKey> spec, CancellationToken ct = default)
+        {
+            var query = SpecificationEvaluator.CreateQuery(dbContext.Set<TEntity>(), spec);
+
+            return await query.ToListAsync(ct);
+        }
     }
 }
