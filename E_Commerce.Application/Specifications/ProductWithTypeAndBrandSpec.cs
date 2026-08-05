@@ -9,7 +9,8 @@ namespace E_Commerce.Application.Specifications
 {
     internal class ProductWithTypeAndBrandSpec : BaseSpecification<Product, int>
     {
-        public ProductWithTypeAndBrandSpec():base(null)
+        public ProductWithTypeAndBrandSpec(int? BrandId, int? TypeId)
+            :base(p => (!BrandId.HasValue || p.BrandId == BrandId.Value) && (!TypeId.HasValue || p.TypeId == TypeId.Value))
         {
             AddInclude(p => p.ProductType);
             AddInclude(p => p.ProductBrand);
