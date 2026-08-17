@@ -34,6 +34,10 @@ namespace E_Commerce.Infrastructure.Specifications
             {
                 query = query.OrderByDescending(spec.OrderByDesc);
             }
+            if(spec.IsPaginated)
+            {
+                query = query.Skip(spec.Skip).Take(spec.Take);
+            }
 
             return query;
         }
