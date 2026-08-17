@@ -14,10 +14,20 @@ namespace E_Commerce.Application.Specifications
         public ICollection<Expression<Func<TEntity, object>>> IncludeExpressions { get; } = [];
 
         public Expression<Func<TEntity, bool>> Criteria { get; private set; }
+        public Expression<Func<TEntity, object>>? OrderBy { get; private set; }
+        public Expression<Func<TEntity, object>>? OrderByDesc { get; private set; }
 
         protected BaseSpecification(Expression<Func<TEntity, bool>> criteria)
         {
             Criteria = criteria;
+        }
+        protected void AddOrderBy(Expression<Func<TEntity, object>> orderByExpression)
+        {
+            OrderBy = orderByExpression;
+        }
+        protected void AddOrderByDesc(Expression<Func<TEntity, object>> orderByDescExpression)
+        {
+            OrderByDesc = orderByDescExpression;
         }
         protected void AddInclude(Expression<Func<TEntity, object>> expression)
         {
