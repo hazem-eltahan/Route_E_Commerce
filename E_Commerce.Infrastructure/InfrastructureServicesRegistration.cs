@@ -23,13 +23,14 @@ namespace E_Commerce.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            //services.AddScoped<IDataSeeder, CatalogDataSeeder>();
             services.AddKeyedScoped<IDataSeeder, CatalogDataSeeder>("Catalog");
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddSingleton<IConnectionMultiplexer>(config =>
             {
                 return ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")!);
             });
+            services.AddScoped<IBasketRepository, BasketRepository>();
+
             return services;
         }
     }
