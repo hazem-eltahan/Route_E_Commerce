@@ -42,7 +42,10 @@ namespace E_Commerce.Infrastructure
             });
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddSingleton<ICacheRepository, CacheRepository>();
-            services.AddIdentityCore<ApplicationUser>()
+            services.AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<StoreIdentityDbContext>();
             services.AddScoped<IIdentityService, IdentityService>();

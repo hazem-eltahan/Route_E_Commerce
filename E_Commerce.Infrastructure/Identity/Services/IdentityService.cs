@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Application.Common;
 using E_Commerce.Application.Contracts;
+using E_Commerce.Application.DTOs.Identity;
 using E_Commerce.Infrastructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -25,6 +26,25 @@ namespace E_Commerce.Infrastructure.Identity.Services
                 return Result<bool>.Fail(Error.NotFound("Email.NotFound", $"User with email {email} is not found!"));
             else
                 return await _userManager.CheckPasswordAsync(user, password);
+        }
+
+        public async Task<Result<IdentityUserResult>> CreateUserAsync(RegisterDto registerDto, CancellationToken ct = default)
+        {
+            var user = new ApplicationUser()
+            {
+                Email = registerDto.Email,
+                DisplayName = registerDto.DisplayName,
+                UserName = registerDto.UserName,
+                PhoneNumber = registerDto.PhoneNumber,
+            };
+            var userResult = await _userManager.CreateAsync(user, registerDto.Password);
+            if(!userResult.Succeeded)
+            {
+                var errors = userResult.Errors.Select(e=> new Error(e.Code,e.Description)).ToList();
+                return Result<IdentityUserResult>.Fail(errors);
+            }
+
+            return Result<IdentityUserResult>.OK(new IdentityUserResult(user.Id, user.DisplayName, user.Email, user.UserName));
         }
 
         public async Task<Result<IdentityUserResult>> FindUserByEmailAsync(string email, CancellationToken ct = default)

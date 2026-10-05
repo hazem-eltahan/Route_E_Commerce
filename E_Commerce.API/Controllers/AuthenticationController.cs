@@ -1,4 +1,5 @@
 ﻿using E_Commerce.Application.Contracts;
+using E_Commerce.Application.DTOs.Identity;
 using E_Commerce.Application.DTOs.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,18 @@ namespace E_Commerce.API.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto, CancellationToken ct)
         {
-            return ToActionResult(await _authenticationService.LoginAsync(loginDto));
+            return ToActionResult(await _authenticationService.LoginAsync(loginDto, ct));
+        }
+
+        [HttpPost("Register")]
+        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto, CancellationToken ct)
+        {
+            return ToActionResult(await _authenticationService.RegisterAsync(registerDto, ct));
         }
     }
 }
+    
