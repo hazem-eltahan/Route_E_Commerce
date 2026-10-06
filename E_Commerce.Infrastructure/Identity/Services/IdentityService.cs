@@ -55,5 +55,17 @@ namespace E_Commerce.Infrastructure.Identity.Services
             else
                 return Result<IdentityUserResult>.OK(new IdentityUserResult(user.Id, user.DisplayName, user.Email, user.UserName));
         }
+
+        public async Task<Result<IReadOnlyList<string>>> GetUserRolesAsync(string email, CancellationToken ct = default)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return Error.NotFound("User.NotFound", $"User with email {email} is not found!");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return roles.ToList();
+        }
     }
 }
