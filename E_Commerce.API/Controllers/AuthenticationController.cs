@@ -1,8 +1,10 @@
 ﻿using E_Commerce.Application.Contracts;
 using E_Commerce.Application.DTOs.Identity;
 using E_Commerce.Application.DTOs.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace E_Commerce.API.Controllers
 {
@@ -32,6 +34,15 @@ namespace E_Commerce.API.Controllers
         [HttpGet("ExistingEmail")]
         public async Task<ActionResult<bool>> CheckExistingEmail([FromQuery]string email, CancellationToken ct)
         => ToActionResult(await _authenticationService.CheckExistingEmailAsync(email, ct));
+
+        [Authorize]
+        [HttpGet("CurrentUser")]
+        public async Task<ActionResult<UserDto>> CurrentUser(CancellationToken ct)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email) ?? throw new UnauthorizedAccessException("No email claim found!");
+
+            return ToActionResult(await _authenticationService.GetCurrentUserAsync(email, ct));
+        }
     }
 }
     
