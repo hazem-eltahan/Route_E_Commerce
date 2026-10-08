@@ -19,6 +19,12 @@ namespace E_Commerce.Infrastructure.Identity.Services
         {
             _userManager = userManager;
         }
+
+        public async Task<Result<bool>> CheckExistingEmailAsync(string email, CancellationToken ct = default)
+        {
+            return await _userManager.FindByEmailAsync(email) is not null;
+        }
+
         public async Task<Result<bool>> CheckPasswordAsync(string email, string password, CancellationToken ct = default)
         {
             var user = await _userManager.FindByEmailAsync(email);

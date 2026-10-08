@@ -28,6 +28,10 @@ namespace E_Commerce.API.Controllers
         {
             return ToActionResult(await _authenticationService.RegisterAsync(registerDto, ct));
         }
+
+        [HttpGet("ExistingEmail")]
+        public async Task<ActionResult<bool>> CheckExistingEmail([FromQuery]string email, CancellationToken ct)
+        => ToActionResult(await _authenticationService.CheckExistingEmailAsync(email, ct));
     }
 }
     
