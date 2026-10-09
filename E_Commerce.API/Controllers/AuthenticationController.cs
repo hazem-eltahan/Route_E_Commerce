@@ -32,17 +32,17 @@ namespace E_Commerce.API.Controllers
         }
 
         [HttpGet("ExistingEmail")]
-        public async Task<ActionResult<bool>> CheckExistingEmail([FromQuery]string email, CancellationToken ct)
+        public async Task<ActionResult<bool>> CheckExistingEmail([FromQuery] string email, CancellationToken ct)
         => ToActionResult(await _authenticationService.CheckExistingEmailAsync(email, ct));
 
         [Authorize]
         [HttpGet("CurrentUser")]
         public async Task<ActionResult<UserDto>> CurrentUser(CancellationToken ct)
-        {
-            var email = User.FindFirstValue(ClaimTypes.Email) ?? throw new UnauthorizedAccessException("No email claim found!");
+            => ToActionResult(await _authenticationService.GetCurrentUserAsync(GetEmailClaim(), ct));
 
-            return ToActionResult(await _authenticationService.GetCurrentUserAsync(email, ct));
-        }
+        [Authorize]
+        [HttpGet("Address")]
+        public async Task<ActionResult<AddressDto>> GetUserAddress(CancellationToken ct)
+            => ToActionResult(await _authenticationService.GetUserAddressAsync(GetEmailClaim(), ct));
     }
 }
-    
