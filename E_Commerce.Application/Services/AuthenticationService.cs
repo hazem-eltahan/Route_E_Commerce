@@ -91,5 +91,10 @@ namespace E_Commerce.Application.Services
                 Token = token
             });
         }
+
+        public async Task<Result<AddressDto>> UpdateOrInsertAddressAsync(string email, AddressDto addressDto, CancellationToken ct = default)
+        {
+            return await _identityService.UpdateOrInsertAddressAsync(email, addressDto, ct);
+        }
     }
 }
